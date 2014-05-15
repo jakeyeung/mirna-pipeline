@@ -1,0 +1,7 @@
+
+nohups/*
+old/*
+qsub_out/*
+*.bak
+*.swo
+*.swp
