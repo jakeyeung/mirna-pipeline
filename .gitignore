@@ -5,4 +5,10 @@ qsub_out/*
 *.bak
 *.swo
 *.swp
-*.template.py
+*template.py
+*.pyc
+../.metadata/
+.project
+.pydevproject
+.ropeproject/
+.settings/
