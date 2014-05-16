@@ -64,7 +64,7 @@ class SamRow(object):
         elif self.flag == 0:
             self.strand = '+'
         else:
-            self.strand = self.flag
+            self.strand = None
         if add_chr:
             # add chr prefix
             self.chromo = '%s%s' %('chr', samrow[2])
