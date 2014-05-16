@@ -5,3 +5,4 @@ qsub_out/*
 *.bak
 *.swo
 *.swp
+*.template.py
