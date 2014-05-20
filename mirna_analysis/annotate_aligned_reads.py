@@ -76,9 +76,10 @@ def main(argv=None):
         parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
         parser.add_option("-a", "--annotfile", dest="annotfile", help="set annotation file path [default: %default]", metavar="FILE")
         parser.add_option("-f", "--force", dest="force", action="store_true", help="If output file exists already, overwrite it anyway.")
-        parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. Default: %default")
+        parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. [default: %default]")
+        parser.add_option("-s", "--stats_outfile", dest="stats_outpath", help="Output file of statistics of matched and nonmatched reads [default: %default]")
         # set defaults
-        parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=5)
+        parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=5, stats_outpath="./stats.txt")
 
         # process options
         (opts, args) = parser.parse_args(argv)
@@ -95,7 +96,8 @@ def main(argv=None):
             print("force = %s" % opts.force)
         if opts.max_offset:
             print("max_offset = %s" %opts.max_offset)
-
+        if opts.stats_outpath:
+            print("stats_outpath = %s" %opts.stats_outpath)
         # MAIN BODY #
 
         # index gff3 annotations
@@ -185,15 +187,26 @@ def main(argv=None):
                 outwriter.writerow(header)
         annotated_sam_outfile.close()
 
+        frac_reads_mapped = float(match_reads) / reads_total
+        frac_reads_unmapped = float(nomatch_reads) / reads_total
         if opts.verbose > 0:
             print('%s rows written to: %s' %(writecount, opts.outfile))
             print('%s matched to gff3 file. %s not matched to gff3 file.' \
                   %(match_count, nomatch_count))
-            frac_reads_mapped = float(match_reads) / reads_total
-            frac_reads_unmapped = float(nomatch_reads) / reads_total
             print('Statistics:\n%s/%s (%s) reads mapped.\n%s/%s (%s) reads unmapped.' \
                   %(match_reads, reads_total, frac_reads_mapped,
                     nomatch_reads, reads_total, frac_reads_unmapped))
+
+        #write a statistics file output
+        with open(opts.stats_outpath, 'wb') as stats_outfile:
+            total_reads_row = 'total_reads=%s\n' %reads_total
+            match_reads_row = 'matched_reads=%s\n' %match_reads
+            nomatch_reads_row = 'nonmatched_reads=%s\n' %nomatch_reads
+            frac_reads_mapped_row = 'frac_matched_reads=%s\n' %frac_reads_mapped
+            frac_reads_unmapped_row = 'frac_nonmatched_reads=%s\n' %frac_reads_unmapped
+            for row in [total_reads_row, match_reads_row, nomatch_reads_row,
+                        frac_reads_mapped_row, frac_reads_unmapped_row]:
+                stats_outfile.write(row)
 
     except Exception, e:
         indent = len(program_name) * " "
