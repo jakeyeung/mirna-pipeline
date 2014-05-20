@@ -78,7 +78,7 @@ def main(argv=None):
         parser.add_option("-f", "--force", dest="force", action="store_true", help="If output file exists already, overwrite it anyway.")
         parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. Default: %default")
         # set defaults
-        parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=1)
+        parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=5)
 
         # process options
         (opts, args) = parser.parse_args(argv)
@@ -93,6 +93,8 @@ def main(argv=None):
             print("annotfile = %s" % opts.annotfile)
         if opts.force:
             print("force = %s" % opts.force)
+        if opts.max_offset:
+            print("max_offset = %s" %opts.max_offset)
 
         # MAIN BODY #
 
@@ -165,7 +167,7 @@ def main(argv=None):
                         elif dickey_neg_offset in gff3_dic:
                             annot = gff3_dic[dickey_neg_offset]['attrib']
                             #add offset information into annot
-                            annot = '%s;Offset=%s' %(annot, offset)
+                            annot = '%s;Offset=%s' %(annot, (-1*offset))
                             match_count += 1
                             match_reads += reads
                             matched = True
