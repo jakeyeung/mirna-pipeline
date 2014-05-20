@@ -15,5 +15,5 @@ do
 	echo "samfile=$mirna_dir/$samp/$samp.bwa.sam"
 	echo "outfile=$mirna_dir/$samp/$samp.annotated"
 	echo "shellscript=$annotate_reads_script"
-	qsub -S /bin/sh -N annotate_mirna_reads -l h_vmem=500M,virtual_free=100M -notify -b y -j y -o $qsub_outdir/"$samp"_annotate_aligned_reads.out -e $qsub_outdir/"$samp"_annotate_aligned_reads.err -v samfile=$mirna_dir/$samp/$samp.bwa.sam,outfile=$mirna_dir/$samp/$samp.annotated $annotate_reads_script
+	qsub -S /bin/sh -N annotate_mirna_reads -l h_vmem=500M,virtual_free=100M -notify -b y -j y -o $qsub_outdir/"$samp"_annotate_aligned_reads.out -e $qsub_outdir/"$samp"_annotate_aligned_reads.err -v samfile=$mirna_dir/$samp/$samp.bwa.sam,outfile=$mirna_dir/$samp/$samp.annotated,statsfile=$mirna_dir/$samp/$samp.annotated.stats $annotate_reads_script
 done
