@@ -207,6 +207,8 @@ def main(argv=None):
             for row in [total_reads_row, match_reads_row, nomatch_reads_row,
                         frac_reads_mapped_row, frac_reads_unmapped_row]:
                 stats_outfile.write(row)
+            if opts.verbose > 0:
+                print('Statistics file written to: %s' %opts.stats_outpath)
 
     except Exception, e:
         indent = len(program_name) * " "
