@@ -12,3 +12,4 @@ qsub_out/*
 .pydevproject
 .ropeproject/
 .settings/
+cfis*
