@@ -45,6 +45,14 @@ def get_n_reads_from_mirna_id(mirna_sam_id):
     '''
     return mirna_sam_id.split('|')[1]
 
+def get_annotations(dickey, gff3_dic):
+    '''
+    Given key, try to get annotations from gff3_dic.
+    If dickey not in gff3_dic, it will throw error...
+    '''
+    annot = gff3_dic[dickey]['attrib']    # miRNA annotation info
+    return annot
+
 def main(argv=None):
     '''Command line options.'''
 
@@ -68,8 +76,9 @@ def main(argv=None):
         parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
         parser.add_option("-a", "--annotfile", dest="annotfile", help="set annotation file path [default: %default]", metavar="FILE")
         parser.add_option("-f", "--force", dest="force", action="store_true", help="If output file exists already, overwrite it anyway.")
+        parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. Default: %default")
         # set defaults
-        parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3")
+        parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=1)
 
         # process options
         (opts, args) = parser.parse_args(argv)
@@ -113,19 +122,62 @@ def main(argv=None):
         # open sam file, get elements in each row of sam file
         sam_file = SamParser.SamFile(opts.infile)
         match_count = 0
+        match_reads = 0
         nomatch_count = 0
+        nomatch_reads = 0
+        reads_total = 0
         with sam_file:
             for writecount, samrow in enumerate(sam_file):
                 dickey = '%s:%s:%s' %(samrow.chromo, samrow.start, samrow.strand)
                 # match dickey to dic
+                reads = int(get_n_reads_from_mirna_id(samrow.id))
+                reads_total += reads
                 if dickey in gff3_dic:
                     annot = gff3_dic[dickey]['attrib']    # miRNA annotation info
                     match_count += 1
+                    match_reads += reads
                 else:
-                    # not in dic, report it?
-                    annot = samrow.flag
-                    nomatch_count += 1
-                reads = get_n_reads_from_mirna_id(samrow.id)
+                    '''
+                    # not in dic. First try harder. Could be off by one or two
+                    # reads. We'll count +/- 10
+                    First change dickey start to start+1, check if it's in dic. Then
+                    do dickey start to start-1, check if it's dic.
+                    Repeat until some increment, say +/-10 or some maximum defined
+                    by options (user-settable)
+                    '''
+                    #----Begin trying +/- starts to get match to annotations...
+                    offset = 1
+                    matched = False
+                    while (matched==False) and (offset <= opts.max_offset):
+                        dickey_pos_offset = '%s:%s:%s' %(samrow.chromo,
+                                                        (samrow.start+offset),
+                                                        samrow.strand)
+                        dickey_neg_offset = '%s:%s:%s' %(samrow.chromo,
+                                                        (samrow.start-offset),
+                                                        samrow.strand)
+                        if dickey_pos_offset in gff3_dic:
+                            annot = gff3_dic[dickey_pos_offset]['attrib']
+                            #add offset information into annot
+                            annot = '%s;Offset=%s' %(annot, offset)
+                            match_count += 1
+                            match_reads += reads
+                            matched = True
+                        elif dickey_neg_offset in gff3_dic:
+                            annot = gff3_dic[dickey_neg_offset]['attrib']
+                            #add offset information into annot
+                            annot = '%s;Offset=%s' %(annot, offset)
+                            match_count += 1
+                            match_reads += reads
+                            matched = True
+                        else:
+                            # neither pos or neg increment worked, try
+                            # increasing offset and repeat.
+                            offset += 1
+                    #----End trying +/- starts to get match to annotations...
+                    if matched is False:
+                        annot = samrow.flag
+                        nomatch_count += 1
+                        nomatch_reads += reads
                 header = \
                     [samrow.chromo, samrow.start, samrow.end, samrow.strand, reads, annot]
                 outwriter.writerow(header)
@@ -135,6 +187,11 @@ def main(argv=None):
             print('%s rows written to: %s' %(writecount, opts.outfile))
             print('%s matched to gff3 file. %s not matched to gff3 file.' \
                   %(match_count, nomatch_count))
+            frac_reads_mapped = float(match_reads) / reads_total
+            frac_reads_unmapped = float(nomatch_reads) / reads_total
+            print('Statistics:\n%s/%s (%s) reads mapped.\n%s/%s (%s) reads unmapped.' \
+                  %(match_reads, reads_total, frac_reads_mapped,
+                    nomatch_reads, reads_total, frac_reads_unmapped))
 
     except Exception, e:
         indent = len(program_name) * " "
