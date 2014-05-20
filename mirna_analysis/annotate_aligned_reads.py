@@ -76,8 +76,8 @@ def main(argv=None):
         parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
         parser.add_option("-a", "--annotfile", dest="annotfile", help="set annotation file path [default: %default]", metavar="FILE")
         parser.add_option("-f", "--force", dest="force", action="store_true", help="If output file exists already, overwrite it anyway.")
-        parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. [default: %default]")
-        parser.add_option("-s", "--stats_outfile", dest="stats_outpath", help="Output file of statistics of matched and nonmatched reads [default: %default]")
+        parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. [default: %default]", metavar="INT")
+        parser.add_option("-s", "--stats_outfile", dest="stats_outpath", help="Output file of statistics of matched and nonmatched reads [default: %default]", metavar="FILE")
         # set defaults
         parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=5, stats_outpath="./stats.txt")
 
