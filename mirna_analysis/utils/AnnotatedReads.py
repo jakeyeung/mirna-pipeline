@@ -16,13 +16,14 @@ class AnnotatedReads(object):
     A class representing Annotated Sam File
     '''
 
-    def __init__(self, annotated_reads_file, stats_file):
+    def __init__(self, annotated_reads_file, stats_file=None):
         '''
         Constructor
         '''
         self.areadspath = annotated_reads_file
         self.statspath = stats_file
-        self.total_reads, self.matched_reads, self.nonmatched_reads = self.get_stats()
+        if self.statspath is not None:
+            self.total_reads, self.matched_reads, self.nonmatched_reads = self.get_stats()
 
     def get_stats(self):
         '''
