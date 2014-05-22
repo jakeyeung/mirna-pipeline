@@ -62,10 +62,12 @@ class AnnotatedReads(object):
     def __exit__(self, type, value, tb):
         self.areadsfile.close()
 
-def index_annotatedreads_file(annotatedreads_file, count_id='TPM'):
+def index_annotatedreads_file(annotatedreads_file, count_id='TPM', subdic=True):
     '''
     annotatedreads_file: file object of class AnnotatedReads
     count_id = 'TPM' | 'reads': retrieve either reads or normalized reads (TPM)
+    subdic = Boolean: whether to return a dic containig subdics as value, or just have
+    annotatedreads as value directly
 
     # Index to dic with annotation as dickey
     Rationale for using annotation as dickey:
@@ -91,8 +93,18 @@ def index_annotatedreads_file(annotatedreads_file, count_id='TPM'):
             annot = row[annotatedreads_file.header.index('annotations')]
             if annot not in outdic:
                 #create subdics if annot not yet initialized
-                outdic[annot] = {'%s'%count_id:0.}
+                if subdic:
+                    outdic[annot] = {'%s'%count_id:0.}
+                elif not subdic:
+                    outdic[annot] = 0
+                else:
+                    print '"subdic" expected True or False. %s' %subdic
             # assumes subdics are now initialized
             # fill subdics with row info
-            outdic[annot]['%s'%count_id] += annotatedreads
+            if subdic:
+                outdic[annot]['%s'%count_id] += annotatedreads
+            elif not subdic:
+                outdic[annot] += annotatedreads
+            else:
+                print '"subdic" expected True or False. %s' %subdic
     return outdic
