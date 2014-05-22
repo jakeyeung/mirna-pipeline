@@ -27,14 +27,17 @@ from utils import AnnotatedReads, list_utils
 __all__ = []
 __version__ = 0.1
 __date__ = 'May 20 2014'
-__updated__ = ''
+__updated__ = 'May 22 2014'
 
 DEBUG = 0
 TESTRUN = 0
 PROFILE = 0
 
-def index_tpm_file(tpm_file):
+def index_annotatedreads_file(annotatedreads_file, count_id='TPM'):
     '''
+    annotatedreads_file: file object of class AnnotatedReads
+    count_id = 'TPM' | 'reads': retrieve either reads or normalized reads (TPM)
+
     # Index to dic with annotation as dickey
     Rationale for using annotation as dickey:
         microRNAs often have multiple locations in the genome.
@@ -46,30 +49,23 @@ def index_tpm_file(tpm_file):
     Subdics contain chr, start, end, strand, reads, TPM, annotations
 
     Output dic will be of form:
-        {annot: {loc:[chromo1:start1:end1:strand1], tpm:[reads_from_1]. tpm_sum:sum of tpm}}
+        {annot: {annotatedreads_sum:sum of annotatedreads}}
         The lists in subdic should be ordered such that they can be
         iterated in parallel
+
     '''
     outdic = {}
-    with tpm_file:
-        for row in tpm_file.reader:
+    with annotatedreads_file:
+        for row in annotatedreads_file.reader:
             # get row info
-            chromo = row[tpm_file.header.index('chr')]
-            start = int(row[tpm_file.header.index('start')])
-            end = int(row[tpm_file.header.index('end')])
-            strand = row[tpm_file.header.index('strand')]
-            #reads = int(row[tpm_file.header.index('strand')]) #use tpm instead of reads
-            tpm = float(row[tpm_file.header.index('TPM')])
-            annot = row[tpm_file.header.index('annotations')]
+            annotatedreads = float(row[annotatedreads_file.header.index(count_id)])
+            annot = row[annotatedreads_file.header.index('annotations')]
             if annot not in outdic:
                 #create subdics if annot not yet initialized
-                outdic[annot] = {'locs':[], 'tpms':[], 'tpm_sum':0.}
+                outdic[annot] = {'%s'%count_id:0.}
             # assumes subdics are now initialized
             # fill subdics with row info
-            location = '%s:%s:%s:%s' %(chromo, start, end, strand)
-            outdic[annot]['locs'].append(location)
-            outdic[annot]['tpms'].append(tpm)
-            outdic[annot]['tpm_sum'] += tpm
+            outdic[annot]['%s'%count_id] += annotatedreads
     return outdic
 
 def main(argv=None):
@@ -94,9 +90,9 @@ def main(argv=None):
     parser.add_option("-b", "--benign", dest="benignfile", help="set input path for benign [default: %default]", metavar="FILE")
     parser.add_option("-o", "--out", dest="outfile", help="set output path [default: %default]", metavar="FILE")
     parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
-
+    parser.add_option("-r", "--reads_id", dest="reads_id", help="Extract raw reads or normalized reads (TPM)", metavar="TPM | reads")
     # set defaults
-    parser.set_defaults(outfile="./out.txt", infile="./in.txt")
+    parser.set_defaults(outfile="./out.txt", infile="./in.txt", reads_id="reads")
 
     # process options
     (opts, args) = parser.parse_args(argv)
@@ -109,41 +105,43 @@ def main(argv=None):
         print("benignfile = %s" % opts.benignfile)
     if opts.outfile:
         print("outfile = %s" % opts.outfile)
+    if opts.reads_id:
+        print("reads_id = %s" % opts.reads_id)
 
     # MAIN BODY #
-    tumour_tpm = AnnotatedReads.AnnotatedReads(opts.tumourfile)
-    benign_tpm = AnnotatedReads.AnnotatedReads(opts.benignfile)
+    tumour_annotatedreads = AnnotatedReads.AnnotatedReads(opts.tumourfile)
+    benign_annotatedreads = AnnotatedReads.AnnotatedReads(opts.benignfile)
 
-    benign_dic = index_tpm_file(benign_tpm)
-    tumour_dic = index_tpm_file(tumour_tpm)
+    benign_dic = index_annotatedreads_file(benign_annotatedreads, count_id=opts.reads_id)
+    tumour_dic = index_annotatedreads_file(tumour_annotatedreads, count_id=opts.reads_id)
 
     #init outfile
     outfile = open(opts.outfile, 'wb')
     outwriter = csv.writer(outfile, delimiter='\t')
     '''
     # write header containing:
-    [mirna(annotations), tpm_benign, tpm_tumour, fold_change,
+    [mirna(annotations), annotatedreads_benign, annotatedreads_tumour, fold_change,
     locations_benign,
-    locations_benign_tpms, locations_tumour, locations_tumour_tpms]
+    locations_benign_annotatedreadss, locations_tumour, locations_tumour_annotatedreadss]
     '''
     writeheader = ['mirna',
-                   'tpm_benign_sum',
-                   'tpm_tumour_sum',
-                   'tpm_sum_fold_change']
+                   '%s_benign_sum' %opts.reads_id,
+                   '%s_tumour_sum' %opts.reads_id,
+                   '%s_sum_fold_change' %opts.reads_id]
     outwriter.writerow(writeheader)
 
     for annot in benign_dic.keys():
         try:
-            tumour_tpm_sum = tumour_dic[annot]['tpm_sum']
+            tumour_annotatedreads_sum = tumour_dic[annot]['%s' %opts.reads_id]
         except KeyError:
             continue
-        #calculate fold change, get locations and tpms lists
-        benign_tpm_sum = benign_dic[annot]['tpm_sum']
-        fold_change = float(tumour_tpm_sum) / benign_tpm_sum
+        #calculate fold change, get locations and annotatedreadss lists
+        benign_annotatedreads_sum = benign_dic[annot]['%s' %opts.reads_id]
+        fold_change = float(tumour_annotatedreads_sum) / benign_annotatedreads_sum
         # write row, matching to writeheader
         writerow = [annot,
-                    benign_tpm_sum,
-                    tumour_tpm_sum,
+                    benign_annotatedreads_sum,
+                    tumour_annotatedreads_sum,
                     fold_change]
         outwriter.writerow(writerow)
     outfile.close()
