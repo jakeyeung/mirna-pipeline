@@ -59,9 +59,9 @@ def main(argv=None):
     parser.add_option("-i", "--in", dest="infile", help="set input path containing list of filepaths [default: %default]", metavar="FILE")
     parser.add_option("-o", "--out", dest="outfile", help="set output path for merged read counts table[default: %default]", metavar="FILE")
     parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
-    parser.add_option("-n", "--nan_str", dest="nan_str", help="Output nan_str if sample does not have info on an miRNA", metavar="STR")
+    parser.add_option("-n", "--nan", dest="nan", type="int", help="Output nan if sample does not have info on an miRNA.", metavar="INT")
     # set defaults
-    parser.set_defaults(outfile="./out.txt", infile="./in.txt", nan_str="NA")
+    parser.set_defaults(outfile="./out.txt", infile="./in.txt", nan=0)
 
     # process options
     (opts, args) = parser.parse_args(argv)
@@ -112,7 +112,7 @@ def main(argv=None):
                 if sampid in merged_dic[annot]:
                     writerow.append(merged_dic[annot][sampid])
                 else:
-                    writerow.append('NA')
+                    writerow.append(opts.nan)
             outwriter.writerow(writerow)
             writerowcount += 1
     if opts.verbose > 0:
