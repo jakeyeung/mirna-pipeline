@@ -1,9 +1,14 @@
 #!/usr/local/bin/python2.7
 # encoding: utf-8
 '''
-Description:
+Description: takes 2 inputs: 1) miRNA-seq data annotated using
+annotate_aligned_reads.py and 2) statistics from annotate_aligned_reads.py
+which contains library depth and outputs a file of similar structure
+as 1) but includes a measurement of "transcripts" per million mapped reads.
+In the case of miRNA, we take each count as a transcript.
 
-Classes and methods:
+Classes and methods: calculate_tpm() calculates transcripts per million
+mapped reads in miRNA samples
 
 @author:     jakeyeung
 
