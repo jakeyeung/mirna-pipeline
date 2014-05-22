@@ -33,41 +33,6 @@ DEBUG = 0
 TESTRUN = 0
 PROFILE = 0
 
-def index_annotatedreads_file(annotatedreads_file, count_id='TPM'):
-    '''
-    annotatedreads_file: file object of class AnnotatedReads
-    count_id = 'TPM' | 'reads': retrieve either reads or normalized reads (TPM)
-
-    # Index to dic with annotation as dickey
-    Rationale for using annotation as dickey:
-        microRNAs often have multiple locations in the genome.
-        The genome locations to which miRNAs are mapped are actually
-        not too reliable.
-        All we can do is to collect common microRNAs and group them
-        But we will keep track of the genome locations if we want
-        to do downstream DNA mutation analysis
-    Subdics contain chr, start, end, strand, reads, TPM, annotations
-
-    Output dic will be of form:
-        {annot: {annotatedreads_sum:sum of annotatedreads}}
-        The lists in subdic should be ordered such that they can be
-        iterated in parallel
-
-    '''
-    outdic = {}
-    with annotatedreads_file:
-        for row in annotatedreads_file.reader:
-            # get row info
-            annotatedreads = float(row[annotatedreads_file.header.index(count_id)])
-            annot = row[annotatedreads_file.header.index('annotations')]
-            if annot not in outdic:
-                #create subdics if annot not yet initialized
-                outdic[annot] = {'%s'%count_id:0.}
-            # assumes subdics are now initialized
-            # fill subdics with row info
-            outdic[annot]['%s'%count_id] += annotatedreads
-    return outdic
-
 def main(argv=None):
     '''Command line options.'''
 
@@ -112,9 +77,14 @@ def main(argv=None):
     tumour_annotatedreads = AnnotatedReads.AnnotatedReads(opts.tumourfile)
     benign_annotatedreads = AnnotatedReads.AnnotatedReads(opts.benignfile)
 
-    benign_dic = index_annotatedreads_file(benign_annotatedreads, count_id=opts.reads_id)
-    tumour_dic = index_annotatedreads_file(tumour_annotatedreads, count_id=opts.reads_id)
+    benign_dic = AnnotatedReads.index_annotatedreads_file(benign_annotatedreads, count_id=opts.reads_id)
+    tumour_dic = AnnotatedReads.index_annotatedreads_file(tumour_annotatedreads, count_id=opts.reads_id)
 
+    '''
+    for annot in benign_dic:
+        print benign_dic[annot]
+        raw_input()
+    '''
     #init outfile
     outfile = open(opts.outfile, 'wb')
     outwriter = csv.writer(outfile, delimiter='\t')
