@@ -78,6 +78,7 @@ def main(argv=None):
         parser.add_option("-f", "--force", dest="force", action="store_true", help="If output file exists already, overwrite it anyway.")
         parser.add_option("-m", "--max_offset", dest="max_offset", type="int", help="Adjust start positions up to a max offset in order to find unmatched reads. [default: %default]", metavar="INT")
         parser.add_option("-s", "--stats_outfile", dest="stats_outpath", help="Output file of statistics of matched and nonmatched reads [default: %default]", metavar="FILE")
+        parser.add_option("-t", "--track_offset", dest="track_offset", action="store_true", help="Add offset value to ID to keep track of the offset, default is off")
         # set defaults
         parser.set_defaults(outfile="./out.txt", infile="./in.txt", annotfile="$HOME/data/mirna_annotations/hsa.gff3", max_offset=5, stats_outpath="./stats.txt")
 
@@ -98,6 +99,8 @@ def main(argv=None):
             print("max_offset = %s" %opts.max_offset)
         if opts.stats_outpath:
             print("stats_outpath = %s" %opts.stats_outpath)
+        if opts.track_offset:
+            print("track_offset = %s" %opts.track_offset)
         # MAIN BODY #
 
         # index gff3 annotations
@@ -161,15 +164,17 @@ def main(argv=None):
                                                         samrow.strand)
                         if dickey_pos_offset in gff3_dic:
                             annot = gff3_dic[dickey_pos_offset]['attrib']
-                            #add offset information into annot
-                            annot = '%s;Offset=%s' %(annot, offset)
+                            #add offset information into annot if option set
+                            if opts.track_offset:
+                                annot = '%s;Offset=%s' %(annot, offset)
                             match_count += 1
                             match_reads += reads
                             matched = True
                         elif dickey_neg_offset in gff3_dic:
                             annot = gff3_dic[dickey_neg_offset]['attrib']
-                            #add offset information into annot
-                            annot = '%s;Offset=%s' %(annot, (-1*offset))
+                            #add offset information into annot if option set
+                            if opts.track_offset:
+                                annot = '%s;Offset=%s' %(annot, (-1*offset))
                             match_count += 1
                             match_reads += reads
                             matched = True
