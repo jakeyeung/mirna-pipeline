@@ -27,5 +27,5 @@ cds_All <- estimateDispersions(cds_All)
 
 normalizedCounts_All <- t(t(counts(cds_All)) / sizeFactors(cds_All))
 
-write.table(normalizedCounts_All, file=outputfile, sep="\t", quote=FALSE)
+write.table(normalizedCounts_All, file=outputfile, sep="\t", quote=FALSE, col.names=NA)
 
