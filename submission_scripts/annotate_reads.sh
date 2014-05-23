@@ -8,4 +8,4 @@
 align_reads_pyscript="mirna_analysis/annotate_aligned_reads.py"
 annotfile="/home/jyeung/data/mirna_annotations/hsa.gff3"
 
-python $align_reads_pyscript -v -f -i $samfile -a $annotfile -o $outfile -s $statsfile
+python $align_reads_pyscript -v -f -m 5 -i $samfile -a $annotfile -o $outfile -s $statsfile
