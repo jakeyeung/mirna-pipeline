@@ -102,7 +102,8 @@ def main(argv=None):
         header = deseqreader.next()
         #write header to output, add ttest pvalue at end
         outheader = header
-        outheader.append('ttest_pval')
+        for outhead in ['pval', 'avg_pairwise_log2_fc']:
+            outheader.append(outhead)
         outwriter.writerow(outheader)
         for rowcount, row in enumerate(deseqreader):
             #for each mirna row, calculate fold change for each sample pair
@@ -119,9 +120,13 @@ def main(argv=None):
                 log_benign_reads.append(math.log(benign_read+1, 2))
             #calculate pvalue
             _, ttest_pval = stats.ttest_rel(log_benign_reads, log_tumour_reads)
+            #calculate avg pair-wise fold change
+            pairwise_fc = [(t - n) for t, n in zip(log_tumour_reads, log_benign_reads)]
+            pairwise_fc_avg = sum(pairwise_fc) / float(len(pairwise_fc))
             #writerow to output
             writerow = row
-            row.append(ttest_pval)
+            for val in [ttest_pval, pairwise_fc_avg]:
+                row.append(val)
             outwriter.writerow(writerow)
 
     if opts.verbose > 0:
