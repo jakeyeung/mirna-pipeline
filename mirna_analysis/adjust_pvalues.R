@@ -14,7 +14,6 @@ output_filename <- args[2]
 
 pval_summary <- read.table(filename, 
                            header=TRUE,
-						   row.names=1,
 						   sep='\t')
 
 pvals <- pval_summary$pval    # Second column.
