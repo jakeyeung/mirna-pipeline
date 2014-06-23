@@ -13,4 +13,32 @@ just programs such as bwa.
 
 `submission_scripts` directory contains executable scripts that qsub can call. 
 
+# Example Workflow
+
+## Processing of miRNA data
+
+### Procedure for `uncompress_and_align_mirna.sh`:
+1. Uncompress `fq` files
+2. Uncompress `clean.txt.gz` files
+3. Create `fa` files
+4. Run BWA
+
+## Running BWA
+BWA can also be run separately (useful if you want to run on a local server rather than a cluster).
+
+For example bash script: see `run_bwa.sh`
+
+## Calculate TPM (transcripts per million mapped reads)
+
+### Procedure for `calculate_tpm_mirna.py`:
+1. Calculate TPM for aligned miRNA reads
+
+For example bash script: see `run_calculate_tpm_mirna.sh` that calls the python script.
+
+## Annotate SAM files (output from BWA) and annotate gene information.
+
+`python mirna_analysis/annotate_aligned_reads.py --help` for more information regarding the script that annotates SAM files with gene information.
+
+Example bash script: `run_annotate_aligned_reads.sh`
+
 
