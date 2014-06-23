@@ -79,22 +79,14 @@ def main(argv=None):
         samp_reader = csv.reader(samp_pairs_file, delimiter='\t')
         for row in samp_reader:
             #create tuples: if matched tumour-bening
-            #expect first column to be tumour sample
-            #second column to be benign sample.
+            #expect first column to be benign sample
+            #second column to be tumour sample.
             if len(row[1]) == 0:
                 continue    #empty samples may mean unpaired samples
             samp_pairs.append((row[0], row[1]))
     #init output file
     outfile = open(opts.outfile, 'wb')
     outwriter = csv.writer(outfile, delimiter='\t')
-
-    '''
-    #write header: first column miRNA id, other columns are sample pairs
-    writeheader = ['id']    # first col
-    for samp_pair in samp_pairs:
-        writeheader.append("%s:%s" %samp_pair)  #tumour:benign
-    outwriter.writerow(writeheader)
-    '''
 
     #read deseq file, iterate through each row (miRNA) and calculate fold change
     with open(opts.infile) as deseqfile:
@@ -110,8 +102,8 @@ def main(argv=None):
             log_tumour_reads = []
             log_benign_reads = []
             for samp_pair in samp_pairs:
-                tumour_samp = samp_pair[0]
-                benign_samp = samp_pair[1]
+                tumour_samp = samp_pair[1]
+                benign_samp = samp_pair[0]
                 tumour_read = float(row[header.index(tumour_samp)])
                 benign_read = float(row[header.index(benign_samp)])
                 #convert to log, add +1 to prevent domain errors
