@@ -13,3 +13,5 @@ qsub_out/*
 .ropeproject/
 .settings/
 cifs*
+copy_fastq_qc_images.sh
+*.args
