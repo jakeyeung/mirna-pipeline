@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 # encoding: utf-8
 '''
 Description: annotate_aligned_reads takes sam files (created from run_bwa.sh
