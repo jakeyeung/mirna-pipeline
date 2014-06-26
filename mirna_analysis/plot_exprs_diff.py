@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python
 # encoding: utf-8
 '''
 Description:
@@ -21,7 +21,9 @@ import os
 import csv
 import math
 from optparse import OptionParser
+
 from plot_utils import jplots
+
 
 __all__ = []
 __version__ = 0.1

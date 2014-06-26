@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python
 # encoding: utf-8
 '''
 Description: Filter differentially expressed elements by p-value and fold change

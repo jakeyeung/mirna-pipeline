@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python
 # encoding: utf-8
 '''
 Description: takes 2 inputs: 1) miRNA-seq data annotated using
