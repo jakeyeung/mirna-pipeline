@@ -53,7 +53,11 @@ def get_sample_pairs(sample_pairs_file):
     return sample_pairs
 
 
-def get_paired_exprs_diffs(infile, sample_pairs, genename=None, convert_to_log2=True):
+def get_paired_exprs_diffs(infile,
+                           sample_pairs,
+                           genename=None,
+                           gene_colname=None,
+                           convert_to_log2=True):
     '''
     Read file, find gene name. Get expression values for each sample_pair,
     return a list of differences in gene expression between paired samples.
@@ -65,7 +69,7 @@ def get_paired_exprs_diffs(infile, sample_pairs, genename=None, convert_to_log2=
         jreader = csv.reader(readfile, delimiter='\t')
         header = jreader.next()
         for row in jreader:
-            if row[0] != genename:
+            if row[header.index(gene_colname)] != genename:
                 continue
             else:
                 for sample_pair in sample_pairs:
@@ -120,11 +124,17 @@ def main(argv=None):
         print("samplepairsfile = %s" % opts.samplepairsfile)
     if opts.genename:
         print("genename = %s" % opts.genename)
+    if opts.gene_colname:
+        print("gene_colname = %s" % opts.gene_colname)
 
     # MAIN BODY #
     sample_pairs = get_sample_pairs(opts.samplepairsfile)
 
-    exprs_diff = get_paired_exprs_diffs(opts.infile, sample_pairs, genename=opts.genename)
+    exprs_diff = get_paired_exprs_diffs(opts.infile,
+                                        sample_pairs,
+                                        genename=opts.genename,
+                                        gene_colname=opts.gene_colname,
+                                        convert_to_log2=True)
 
     jplots.plot_vertical_scatter(exprs_diff,
                                  jitter=True,
