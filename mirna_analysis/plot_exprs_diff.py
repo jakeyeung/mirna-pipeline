@@ -23,7 +23,7 @@ import math
 from optparse import OptionParser
 
 from plot_utils import jplots
-
+from scipy import stats
 
 __all__ = []
 __version__ = 0.1
@@ -158,10 +158,15 @@ def main(argv=None):
             print 'Plotting expresssion differences for two genes: %s and %s' \
                 % (opts.genename, opts.genename2)
         # two genes to plot
-        exprs_vector = [exprs_diff ,exprs_diff2]
+        exprs_vector = [exprs_diff, exprs_diff2]
         title = 'Paired differences of tumours: %s vs %s' \
             % (opts.genename, opts.genename2)
         xlabel = '%s (left) vs %s (right)' % (opts.genename, opts.genename2)
+        # calculate mann whitney rank test on two expressions to see if medians
+        # differ
+        u, prob = stats.mannwhitneyu(exprs_diff, exprs_diff2)
+        print 'Mann Whitney test rank test.\nTest-statistic: %s\nPval: %s' \
+            % (u, prob)
     else:
         if opts.verbose:
             print 'Plotting expresssion differences for one gene:' \
