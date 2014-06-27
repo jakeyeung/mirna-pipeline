@@ -41,7 +41,7 @@ def plot_vertical_scatter(y_values,
     ax = plt.axes()
     plt.scatter(x_values, y_values)
     plt.xlim([-1, 1])
-    plt.ylim([-5, 5])
+    plt.ylim([-7, 7])
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
