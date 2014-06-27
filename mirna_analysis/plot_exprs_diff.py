@@ -1,5 +1,4 @@
 #!/usr/bin/python
-#!/usr/local/bin/python
 # encoding: utf-8
 '''
 Description:
@@ -106,7 +105,6 @@ def main(argv=None):
     # setup option parser
     parser = OptionParser(version=program_version_string, epilog=program_longdesc, description=program_license)
     parser.add_option("-i", "--in", dest="infile", help="set input path [default: %default]", metavar="FILE")
-    parser.add_option("-o", "--out", dest="outfile", help="set output path [default: %default]", metavar="FILE")
     parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
     parser.add_option("-g", "--genename", dest="genename", metavar="GENENAME", help="First gene name to plot expression")
     parser.add_option("-c", "--gene_colname", dest="gene_colname", metavar="COLUMNNAME", help="Column name containing gene name [default: %default]")
@@ -122,8 +120,6 @@ def main(argv=None):
         print("verbosity level = %d" % opts.verbose)
     if opts.infile:
         print("infile = %s" % opts.infile)
-    if opts.outfile:
-        print("outfile = %s" % opts.outfile)
     if opts.samplepairsfile:
         print("samplepairsfile = %s" % opts.samplepairsfile)
     if opts.genename:
