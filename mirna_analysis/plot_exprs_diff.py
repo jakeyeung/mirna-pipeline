@@ -79,8 +79,9 @@ def get_paired_exprs_diffs(infile,
                     exprs1 = float(row[header.index(sample_pair[0])])
                     exprs2 = float(row[header.index(sample_pair[1])])
                     if convert_to_log2:
-                        exprs1 = math.log(exprs1, 2)
-                        exprs2 = math.log(exprs2, 2)
+                        # do a plus 1 shift to prevent infinities...
+                        exprs1 = math.log(exprs1 + 1, 2)
+                        exprs2 = math.log(exprs2 + 1, 2)
                     exprs_diff = exprs2 - exprs1
                     exprs_diffs.append(exprs_diff)
     return exprs_diffs
