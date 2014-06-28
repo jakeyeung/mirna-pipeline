@@ -122,12 +122,18 @@ def main(argv=None):
         print("verbosity level = %d" % opts.verbose)
     if opts.infile:
         print("infile = %s" % opts.infile)
+    if opts.infile2:
+        print("infile2 = %s" % opts.infile2)
     if opts.samplepairsfile:
         print("samplepairsfile = %s" % opts.samplepairsfile)
     if opts.genename:
         print("genename = %s" % opts.genename)
+    if opts.genename2:
+        print("genename2 = %s" % opts.genename2)
     if opts.gene_colname:
         print("gene_colname = %s" % opts.gene_colname)
+    if opts.gene_colname2:
+        print("gene_colname2 = %s" % opts.gene_colname2)
 
     # MAIN BODY #
     sample_pairs = get_sample_pairs(opts.samplepairsfile)
