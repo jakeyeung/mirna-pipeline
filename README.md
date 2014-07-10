@@ -56,7 +56,7 @@ Example bash script: `run_annotate_aligned_reads.sh`
 
 <a name "targetscore"/>
 ## Get target score information for a given miRNA.
-Required packages: `TargetScoreData`
+Required packages: [`TargetScoreData`](http://www.bioconductor.org/packages/release/data/experiment/html/TargetScoreData.html)
 
 ### Procedure
 `Rscript get_target_scores.R mirna_name outfile`
